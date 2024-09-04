@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Cronometro</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="styles/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/flowbite@2.4.1/dist/flowbite.min.css" rel="stylesheet" />
+    <body class="bg-gray-100">
+        <div class="text-center">
+            <div id="display" class="text-6xl font-mono mb-8">00:00:00</div>
+            <div class="space-x-4 mb-8">
+                <button id="startPause" class="bg-blue-500 text-white px-4 py-2 rounded">Iniciar</button>
+                <button id="reset" class="bg-red-500 text-white px-4 py-2 rounded">Reiniciar</button>
+                <button id="lap" class="bg-green-500 text-white px-4 py-2 rounded">Registrar Vuelta</button>
+            </div>
+            <ul id="laps" class="list-none space-y-2"></ul>
+        </div>
+        <script src="script.js"></script>
+    </body>
+    </html>
+    <script>
+        let horas = 0, minutos = 0, segundos = 0, milisegundos = 0;
+        let cronometroEnMarcha = false;
+        let intervalo;
+
+        function actualizarDisplay() {
+            let h = horas < 10 ? `0${horas}` : horas;
+            let m = minutos < 10 ? `0${minutos}` : minutos;
+            let s = segundos < 10 ? `0${segundos}` : segundos;
+            document.getElementById('display').textContent = `${h}:${m}:${s}`;
+        }
+
+        function iniciarCronometro() {
+            intervalo = setInterval(() => {
+                milisegundos++;
+                if (milisegundos >= 100) {
+                    milisegundos = 0;
+                    segundos++;
+                }
+                if (segundos >= 60) {
+                    segundos = 0;
+                    minutos++;
+                }
+                if (minutos >= 60) {
+                    minutos = 0;
+                    horas++;
+                }
+                actualizarDisplay();
+            }, 10);
+        }
+
+        document.getElementById('startPause').addEventListener('click', () => {
+            if (cronometroEnMarcha) {
+                clearInterval(intervalo);
+                document.getElementById('startPause').textContent = 'Iniciar';
+            } else {
+                iniciarCronometro();
+                document.getElementById('startPause').textContent = 'Pausar';
+            }
+            cronometroEnMarcha = !cronometroEnMarcha;
+        });
+
+        document.getElementById('reset').addEventListener('click', () => {
+            clearInterval(intervalo);
+            horas = 0;
+            minutos = 0;
+            segundos = 0;
+            milisegundos = 0;
+            actualizarDisplay();
+            document.getElementById('startPause').textContent = 'Iniciar';
+            cronometroEnMarcha = false;
+            document.getElementById('laps').innerHTML = '';
+        });
+
+        document.getElementById('lap').addEventListener('click', () => {
+            if (cronometroEnMarcha) {
+                let lapTime = document.getElementById('display').textContent;
+                let lapItem = document.createElement('li');
+                lapItem.textContent = `Vuelta: ${lapTime}`;
+                lapItem.className = 'bg-gray-200 p-2 rounded';
+                document.getElementById('laps').appendChild(lapItem);
+            }
+        });
+    </script>
