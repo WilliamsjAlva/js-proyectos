@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Juego de memorias</title>
+    <link rel="shortcut icon" href="https://cdn-icons-png.freepik.com/256/6062/6062148.png?semt=ais_hybrid">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/flowbite@2.4.1/dist/flowbite.min.css" rel="stylesheet" />
+    <link href="https://fonts.cdnfonts.com/css/digital-7-mono" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            background: url('img/background.jpeg') no-repeat;
+            background-size: cover;
+        }
+
+        .game-board {
+            min-height: 100vh;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        #timer {
+            color: white;
+            position: fixed;
+            border-radius: 5px;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2rem;
+            z-index: 10;
+            padding: 5px;
+        }
+
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            visibility: hidden;
+            z-index: 20;
+        }
+
+
+        #message {
+            color: white;
+            font-size: 3rem;
+            text-align: center;
+        }
+
+        .card {
+            width: 100px;
+            height: 140px;
+            margin: 1rem;
+            position: relative;
+            transition: transform 0.5s;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card div {
+            width: 100%;
+            height: 100%;
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            backface-visibility: hidden;
+            pointer-events: none;
+        }
+
+        .card .back {
+            border: 8px solid #F6F8EB;
+            background: url('img/back4.png') center / cover no-repeat;
+        }
+
+        .card .face {
+            background: #F6F8EB;
+            transform: rotateY(180deg);
+        }
+
+        .blur {
+            filter: blur(5px);
+            pointer-events: none;
+        }
+
+        @media (max-width: 640px) {
+            .game-board {
+                padding-top: 80px;
+            }
+
+            #timer {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h1 id="timer">🕓: 60s</h1>
+
+    <div id="overlay">
+        <div id="message"></div>
+    </div>
+
+    <div class="game-board">
+        <div class="card" data-name="card1">
+            <div class="face">
+                <img src="img/card1.png" alt="Card 1">
+            </div>
+            <div class="back"></div>
+        </div>
+        <div class="card" data-name="card2">
+            <div class="face">
+                <img src="img/card2.png" alt="Card 2">
+            </div>
+            <div class="back"></div>
+        </div>
+        <div class="card" data-name="card3">
+            <div class="face">
+                <img src="img/card3.png" alt="Card 3">
+            </div>
+            <div class="back"></div>
+        </div>
+        <div class="card" data-name="card4">
+            <div class="face">
+                <img src="img/card4.png" alt="Card 4">
+            </div>
+            <div class="back"></div>
+        </div>
+        <div class="card" data-name="card5">
+            <div class="face">
+                <img src="img/card5.png" alt="Card 5">
+            </div>
+            <div class="back"></div>
+        </div>
+        <div class="card" data-name="card6">
+            <div class="face">
+                <img src="img/card6.png" alt="Card 6">
+            </div>
+            <div class="back"></div>
+        </div>
+        <div class="card" data-name="card1">
+            <div class="face">
+                <img src="img/card1.png" alt="Card 1">
+            </div>
+            <div class="back"></div>
+        </div>
+        <div class="card" data-name="card2">
+            <div class="face">
+                <img src="img/card2.png" alt="Card 2">
+            </div>
+            <div class="back"></div>
+        </div>
+        <div class="card" data-name="card3">
+            <div class="face">
+                <img src="img/card3.png" alt="Card 3">
+            </div>
+            <div class="back"></div>
+        </div>
+        <div class="card" data-name="card4">
+            <div class="face">
+                <img src="img/card4.png" alt="Card 4">
+            </div>
+            <div class="back"></div>
+        </div>
+        <div class="card" data-name="card5">
+            <div class="face">
+                <img src="img/card5.png" alt="Card 5">
+            </div>
+            <div class="back"></div>
+        </div>
+        <div class="card" data-name="card6">
+            <div class="face">
+                <img src="img/card6.png" alt="Card 6">
+            </div>
+            <div class="back"></div>
+        </div>
+    </div>
+
+    <script>
+        const cards = document.querySelectorAll('.card');
+        let hasFlippedCard = false;
+        let lockBoard = false;
+        let firstCard, secondCard;
+        let timeLeft = 60;
+        let timerId;
+        let matchedPairs = 0;
+
+        function flipCard() {
+            if (lockBoard) return;
+            if (this === firstCard) return;
+
+            this.classList.add('flipped');
+
+            if (!hasFlippedCard) {
+                hasFlippedCard = true;
+                firstCard = this;
+                return;
+            }
+
+            secondCard = this;
+            checkForMatch();
+        }
+
+        function checkForMatch() {
+            let isMatch = firstCard.dataset.name === secondCard.dataset.name;
+            isMatch ? disableCards() : unflipCards();
+        }
+
+        function disableCards() {
+            firstCard.removeEventListener('click', flipCard);
+            secondCard.removeEventListener('click', flipCard);
+            matchedPairs++;
+            if (matchedPairs === 6) {
+                endGame(true);
+            }
+            resetBoard();
+        }
+
+        function unflipCards() {
+            lockBoard = true;
+            setTimeout(() => {
+                firstCard.classList.remove('flipped');
+                secondCard.classList.remove('flipped');
+                resetBoard();
+            }, 1000);
+        }
+
+        function resetBoard() {
+            [hasFlippedCard, lockBoard] = [false, false];
+            [firstCard, secondCard] = [null, null];
+        }
+
+        function endGame(won) {
+            clearInterval(timerId);
+            const overlay = document.getElementById('overlay');
+            const message = document.getElementById('message');
+
+            if (won) {
+                message.textContent = '¡Felicidades! Terminaste el juego de memoria';
+                document.querySelectorAll('.card').forEach(card => card.classList.add('blur'));
+            } else {
+                message.textContent = '¡Se acabó el tiempo! Inténtalo de nuevo.';
+            }
+
+            overlay.style.visibility = 'visible';
+            setTimeout(resetGame, 3000);
+        }
+
+        function startTimer() {
+            timerId = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timer').textContent = `🕓: ${timeLeft}s`;
+
+                if (timeLeft === 0) {
+                    endGame(false);
+                }
+            }, 1000);
+        }
+
+        function resetGame() {
+            matchedPairs = 0;
+            timeLeft = 60;
+            document.getElementById('overlay').style.visibility = 'hidden';
+
+            cards.forEach(card => {
+                card.classList.remove('flipped', 'blur');
+            });
+
+            cards.forEach(card => card.addEventListener('click', flipCard));
+            shuffleCards();
+            startTimer();
+        }
+
+        function shuffleCards() {
+            cards.forEach(card => {
+                let randomPos = Math.floor(Math.random() * 12);
+                card.style.order = randomPos;
+            });
+        }
+
+        cards.forEach(card => card.addEventListener('click', flipCard));
+        shuffleCards();
+        startTimer();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Cronometro</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/flowbite@2.4.1/dist/flowbite.min.css" rel="stylesheet"/>
+    <link href="https://fonts.cdnfonts.com/css/digital-7-mono" rel="stylesheet">
+    <link rel="stylesheet" href="index.css">
+    <link rel="shortcut icon" href="https://static.vecteezy.com/system/resources/previews/024/096/926/non_2x/chronometer-timer-counter-free-png.png">
+</head>
+<body class="bg-gray-100 h-screen">
+    <div class="flex items-center justify-center h-screen">
+        <div class="text-center">
+            <div class="flex flex-col items-center">
+                <div class="bg-gray-500 w-6 h-2 rounded-t"></div>
+                <div class="bg-gray-700 w-9 h-4 rounded-t"></div>
+            </div>
+            <div id="display" class="bg-[#D7E7E8] border-[20px] border-gray-400 rounded-full text-5xl mb-8 px-8 py-5 digitalClockFont w-[250px] mx-auto">
+                00:00:00
+            </div>
+            <div class="space-x-4 mb-8">
+                <button id="startPause" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 active:bg-gray-700">Iniciar ▶️</button>
+                <button id="reset" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500 active:bg-gray-600">Reiniciar 🔄</button>
+                <button id="lap" class="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400 active:bg-gray-500">Registrar Vuelta 📝</button>
+            </div>
+            <div class="max-h-48 overflow-y-auto p-2 custom-scroll">
+                <ul id="laps" class="list-none space-y-2"></ul>
+            </div>
+        </div>
+    </div>
+    <script>
+        let horas = 0, minutos = 0, segundos = 0, milisegundos = 0;
+        let cronometroEnMarcha = false;
+        let intervalo;
+
+        function actualizarDisplay() {
+            let h = horas < 10 ? `0${horas}` : horas;
+            let m = minutos < 10 ? `0${minutos}` : minutos;
+            let s = segundos < 10 ? `0${segundos}` : segundos;
+            document.getElementById('display').textContent = `${h}:${m}:${s}`;
+        }
+
+        function iniciarCronometro() {
+            intervalo = setInterval(() => {
+                milisegundos++;
+                if (milisegundos >= 100) {
+                    milisegundos = 0;
+                    segundos++;
+                }
+                if (segundos >= 60) {
+                    segundos = 0;
+                    minutos++;
+                }
+                if (minutos >= 60) {
+                    minutos = 0;
+                    horas++;
+                }
+                actualizarDisplay();
+            }, 10);
+        }
+
+        document.getElementById('startPause').addEventListener('click', () => {
+            if (cronometroEnMarcha) {
+                clearInterval(intervalo);
+                document.getElementById('startPause').textContent = 'Iniciar ▶️';
+            } else {
+                iniciarCronometro();
+                document.getElementById('startPause').textContent = 'Pausar ⏸️';
+            }
+            cronometroEnMarcha = !cronometroEnMarcha;
+        });
+
+        document.getElementById('reset').addEventListener('click', () => {
+            clearInterval(intervalo);
+            horas = 0;
+            minutos = 0;
+            segundos = 0;
+            milisegundos = 0;
+            actualizarDisplay();
+            document.getElementById('startPause').textContent = 'Iniciar ▶️';
+            cronometroEnMarcha = false;
+            document.getElementById('laps').innerHTML = '';
+        });
+
+        document.getElementById('lap').addEventListener('click', () => {
+            if (cronometroEnMarcha) {
+                let lapTime = document.getElementById('display').textContent;
+                let lapItem = document.createElement('li');
+                lapItem.textContent = `Vuelta: ${lapTime}`;
+                lapItem.className = 'bg-gray-200 p-2 rounded';
+                document.getElementById('laps').appendChild(lapItem);
+            }
+        });
+        </script>
+</body>
+</html>

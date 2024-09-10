@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Tasa de cambio</title>
+    <link rel="shortcut icon" href="https://cdn-icons-png.freepik.com/256/6062/6062148.png?semt=ais_hybrid">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/flowbite@2.4.1/dist/flowbite.min.css" rel="stylesheet" />
+    <link href="https://fonts.cdnfonts.com/css/digital-7-mono" rel="stylesheet">
+</head>
+
+<body class="bg-[#202C33] flex justify-center items-center h-screen">
+    <div class="bg-gray-100 p-10 rounded-lg shadow-lg text-center">
+        <img src="https://cdn.icon-icons.com/icons2/568/PNG/512/currency_exchange_icon-icons.com_54433.png" alt="Dolar"
+            class="w-40 h-40 mx-auto mb-4">
+        <div class="flex justify-center space-x-4 mb-6">
+            <input id="cantidad" type="number" placeholder="Cantidad"
+                class="border border-gray-300 rounded p-2 w-32 text-center">
+            <select id="monedaOrigen" class="border border-gray-300 rounded p-2 text-center">
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+                <option value="VES">VES</option>
+            </select>
+            <span class="text-xl">→</span>
+            <select id="monedaDestino" class="border border-gray-300 rounded p-2 text-center">
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+                <option value="VES">VES</option>
+            </select>
+        </div>
+        <div id="resultado" class="text-xl text-gray-700"></div>
+    </div>
+    <script>
+        const tasasDeConversion = {
+            "USD": {
+                "USD": 1,
+                "EUR": 0.91,
+                "VES": 36.64
+            },
+            "EUR": {
+                "USD": 1.10,
+                "EUR": 1,
+                "VES": 40.40
+            },
+            "VES": {
+                "USD": 0.027,
+                "EUR": 0.025,
+                "VES": 1
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const inputCantidad = document.getElementById('cantidad');
+            const selectMonedaOrigen = document.getElementById('monedaOrigen');
+            const selectMonedaDestino = document.getElementById('monedaDestino');
+            const resultado = document.getElementById('resultado');
+
+            function convertirMoneda() {
+                const cantidad = parseFloat(inputCantidad.value) || 0;
+                const monedaOrigen = selectMonedaOrigen.value;
+                const monedaDestino = selectMonedaDestino.value;
+
+                const tasaDeConversion = tasasDeConversion[monedaOrigen][monedaDestino];
+                const cantidadConvertida = cantidad * tasaDeConversion;
+                resultado.textContent = `${cantidad} ${monedaOrigen} = ${cantidadConvertida.toFixed(2)} ${monedaDestino}`;
+            }
+
+            inputCantidad.addEventListener('input', convertirMoneda);
+            selectMonedaOrigen.addEventListener('change', convertirMoneda);
+            selectMonedaDestino.addEventListener('change', convertirMoneda);
+        });
+    </script>
+    </body>
+
+</html>
